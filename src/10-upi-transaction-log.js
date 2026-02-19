@@ -47,5 +47,88 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  // validations
+  if (!Array.isArray(transactions) || transactions.length <= 0) return null;
+
+  const actualTransactions = transactions.filter(
+    (transaction) =>
+      transaction.amount > 0 &&
+      (transaction.type === "credit" || transaction.type === "debit"),
+  );
+
+  if (actualTransactions.length <= 0) return null;
+
+  // calculation
+  const totalCredit = actualTransactions.reduce((sum, obj) => {
+    if (obj.type === "credit") {
+      return sum + obj.amount;
+    } else {
+      return sum;
+    }
+  },0);
+
+  const totalDebit = actualTransactions.reduce((sum, obj) => {
+    if (obj.type === "debit") {
+      return sum + obj.amount;
+    } else {
+      return sum;
+    }
+  }, 0);
+
+  const netBalance = totalCredit - totalDebit;
+
+  const transactionCount = actualTransactions.length;
+
+  const totalTransactionAmt = actualTransactions.reduce((sum, cur) => {
+    return sum + cur.amount;
+  },0);
+
+  const avgTransaction = Math.round(totalTransactionAmt/transactionCount);
+
+  const highestTransaction = actualTransactions.reduce((max, cur) => {
+    return max.amount > cur.amount ? max : cur;
+  });
+  
+  const categoryBreakdown = {};
+  
+  for(let obj of actualTransactions){
+    const category = obj.category;
+    if(categoryBreakdown[category] === undefined){
+      categoryBreakdown[category] = obj.amount;
+    } else{
+      categoryBreakdown[category] += obj.amount;
+    }
+  }
+
+  const countTo = {};
+  
+  for(let obj of actualTransactions){
+    const to = obj.to;
+    if(countTo[to] === undefined) {
+      countTo[to] = 1
+    } else {
+      countTo[to] += 1;
+    }
+  }
+  
+  const frequentContact = Object.entries(countTo).reduce((max, cur) => {
+    return max[1] > cur[1] ? max : cur;
+  })[0];
+
+  const allAbove100 = actualTransactions.every(item => item.amount > 100);
+
+  const hasLargeTransaction = actualTransactions.some(item => item.amount >= 5000);
+
+  return {
+    totalCredit,
+    totalDebit,
+    netBalance,
+    transactionCount,
+    avgTransaction,
+    highestTransaction,
+    categoryBreakdown,
+    frequentContact,
+    allAbove100,
+    hasLargeTransaction
+  }
 }

@@ -42,5 +42,55 @@
  *   // => "INVALID PASS"
  */
 export function generateLocalPass(passenger) {
-  // Your code here
+  // passenger object validation
+  if (
+    typeof passenger !== "object" ||
+    passenger === null ||
+    Array.isArray(passenger)
+  )
+    return "INVALID PASS";
+
+  const reqFields = ["name", "from", "to", "classType"];
+
+  // required fields validation
+  if (
+    reqFields.some((input) => {
+      return (
+        !passenger.hasOwnProperty(input) ||
+        typeof passenger[input] !== "string" ||
+        passenger[input].trim().length === 0 // obj.prop will not work here
+      );
+    })
+  )
+    return "INVALID PASS";
+
+  // classType validation
+  if (
+    passenger.classType.toLowerCase() !== "first" &&
+    passenger.classType.toLowerCase() !== "second"
+  )
+    return "INVALID PASS";
+
+  const name = passenger.name.toUpperCase();
+  const from = passenger.from.toUpperCase();
+  const to = passenger.to.toUpperCase();
+  const classType = passenger.classType.toUpperCase();
+  const passId = classType.charAt(0) + from.slice(0, 3) + to.slice(0, 3);
+
+  const formattedFrom = from.charAt(0) + from.slice(1).toLowerCase();
+  const formattedTo = to.charAt(0) + to.slice(1).toLowerCase();
+
+  //   const formattedPass = `MUMBAI LOCAL PASS\n---\nName: ${name}
+  // From: ${formattedFrom}\nTo: ${formattedTo}\nClass: ${classType}\nPass ID: ${passId}`; // clicking enter creates a '\n'.
+
+  const formattedPass = 
+`MUMBAI LOCAL PASS
+---
+Name: ${name}
+From: ${formattedFrom}
+To: ${formattedTo}
+Class: ${classType}
+Pass ID: ${passId}`;
+
+  return formattedPass;
 }

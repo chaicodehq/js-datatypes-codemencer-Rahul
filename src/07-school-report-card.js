@@ -40,6 +40,87 @@
  *   generateReportCard({ name: "Priya", marks: { maths: 35, science: 28 } })
  *   // => { name: "Priya", totalMarks: 63, percentage: 31.5, grade: "F", ... }
  */
+
 export function generateReportCard(student) {
-  // Your code here
+  // validating student object
+  if(
+    typeof student !== 'object' ||
+    student === null ||
+    Array.isArray(student) ||
+    Object.keys(student).length === 0
+  ) return null;
+  
+  // validating name is a string
+  if(
+    typeof student.name !== 'string' ||
+    student.name.length === 0 
+  ) return null;
+  
+  // validating marks is a object
+  if(
+    typeof student.marks !== 'object' ||
+    student.object === null ||
+    Array.isArray(student.marks) ||
+    Object.keys(student.marks).length === 0
+  ) return null;
+  
+  const marksValue = Object.values(student.marks);
+  
+  // validating each mark
+  const invalidMark = marksValue.some((mark) => {
+    return typeof mark !== 'number' || mark < 0 || mark > 100;
+  })
+
+  if(invalidMark) return null;
+
+
+  // *************** calculations *********************
+  const name = student.name;
+
+  const totalMarks = marksValue.reduce((acc, cur) => {
+    return acc + cur;
+  },0);
+
+  const subjectCount = marksValue.length;
+
+  const percentage = parseFloat(((totalMarks / (subjectCount * 100)) * 100).toFixed(2));
+
+  let grade;
+  if (percentage >= 90) grade = "A+";
+  else if (percentage >= 80) grade = "A";
+  else if (percentage >= 70) grade = "B";
+  else if (percentage >= 60) grade = "C";
+  else if (percentage >= 40) grade = "D";
+  else grade = "F";
+  const marksEntries = Object.entries(student.marks); // [["maths", 85], ["science", 92], ["english", 78]]
+  
+  const highestSubject = marksEntries.reduce((max, current) => {
+    return max[1] > current[1] ? max : current;
+  })[0];
+  
+  const lowestSubject = marksEntries.reduce((min, current) => {
+    return min[1] < current[1] ? min : current;
+  })[0];
+
+  const passedSubjects = 
+  marksEntries
+  .filter(([key, value]) => value >= 40)
+  .map(([key, value]) => key);
+
+  const failedSubjects = 
+  marksEntries
+  .filter(([_, value]) => value < 40)
+  .map((arr) => arr[0]);
+
+  return {
+    name,
+    totalMarks,
+    percentage,
+    grade,
+    highestSubject,
+    lowestSubject,
+    passedSubjects,
+    failedSubjects,
+    subjectCount
+  }
 }
